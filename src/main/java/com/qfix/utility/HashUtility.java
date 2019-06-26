@@ -29,14 +29,15 @@ public class HashUtility {
 	public List<HashDetails> listFilesForFolder(final File folder) {
 		byte[] sha1 = null;
 		Date date = Calendar.getInstance().getTime();
-		DateFormat dateFormat = new SimpleDateFormat("yyyy-mm-dd hh:mm:ss");
+		DateFormat dateFormat = new SimpleDateFormat("dd-mm-yyyy");
 		String createdDate = dateFormat.format(date);
 		
 	    for (final File fileEntry : folder.listFiles()) {
 	        if (fileEntry.isDirectory()) {
 	            listFilesForFolder(fileEntry);
 	        } else {
-	        	if(fileEntry.getName().endsWith(".java") || fileEntry.getName().endsWith(".html"))
+	        	if(fileEntry.getName().endsWith(".java") || fileEntry.getName().endsWith(".html")
+	        		|| fileEntry.getName().endsWith(".js") || fileEntry.getName().endsWith(".css"))
 	        	{
 	        		try {
 	        			sha1 = createSha1(fileEntry);
@@ -76,9 +77,11 @@ public class HashUtility {
 	  
 	        // Create a blank sheet 
 	        XSSFSheet sheet = workbook.createSheet("student Details"); 
-	  
-	        int rownum = 0; 
-	        
+    		
+    		int rownum = 0; 
+    		Row rowForGitCommitId = sheet.createRow(rownum++);
+    		Cell cellForGitCommitId = rowForGitCommitId.createCell(rownum);
+    		cellForGitCommitId.setCellValue(Constants.GIT_COMMIT_ID);
 	        if(hashDetails != null && hashDetails.size() > 0)
 	        {
 	        	for(HashDetails hashDetail : hashDetails)
@@ -96,10 +99,10 @@ public class HashUtility {
 	        }
 	        try { 
 	            // this Writes the workbook gfgcontribute 
-	            FileOutputStream out = new FileOutputStream(new File("File hash details.xlsx")); 
+	            FileOutputStream out = new FileOutputStream(new File(Constants.EXPORT_FILE_PATH + "File hash details.xlsx")); 
 	            workbook.write(out); 
 	            out.close(); 
-	            System.out.println("gfgcontribute.xlsx written successfully on disk."); 
+	            System.out.println("File hash details written successfully on disk."); 
 	        } 
 	        catch (Exception e) { 
 	            e.printStackTrace(); 
