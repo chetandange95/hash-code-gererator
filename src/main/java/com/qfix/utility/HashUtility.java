@@ -4,6 +4,7 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.InputStream;
+import java.math.BigInteger;
 import java.security.MessageDigest;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
@@ -79,6 +80,8 @@ public class HashUtility {
 	        XSSFSheet sheet = workbook.createSheet("student Details"); 
     		
     		int rownum = 0; 
+    		String allHashString = "";
+    		HashUtility hashUtility = new HashUtility();
     		Row rowForGitCommitId = sheet.createRow(rownum++);
     		Cell cellForGitCommitId = rowForGitCommitId.createCell(rownum);
     		cellForGitCommitId.setCellValue(Constants.GIT_COMMIT_ID);
@@ -94,8 +97,15 @@ public class HashUtility {
  	                Cell cellFileHash = row.createCell(cellnum++); 
  	                cellFileHash.setCellValue(hashDetail.getSha1Code()); 
  	                Cell cellCreatedDate = row.createCell(cellnum++); 
- 	               cellCreatedDate.setCellValue(hashDetail.getCreatedDate()); 
+ 	                cellCreatedDate.setCellValue(hashDetail.getCreatedDate()); 
+ 	                allHashString += hashDetail.getSha1Code();
 	        	}
+	        	
+	        	Row row = sheet.createRow(rownum++); 
+	        	Cell cellAllHashTitle = row.createCell(0); 
+	        	cellAllHashTitle.setCellValue("All hash SHA-1 :");
+	        	Cell cellAllHash = row.createCell(1); 
+	        	cellAllHash.setCellValue(getSha1ForString(allHashString)); 
 	        }
 	        try { 
 	            // this Writes the workbook gfgcontribute 
@@ -107,5 +117,19 @@ public class HashUtility {
 	        catch (Exception e) { 
 	            e.printStackTrace(); 
 	        } 
+	}
+	
+	private String getSha1ForString(String value) {
+		String sha1 = "";
+		try {
+			MessageDigest digest = MessageDigest.getInstance("SHA-1");
+	        digest.reset();
+	        digest.update(value.getBytes("utf8"));
+	        sha1 = String.format("%040x", new BigInteger(1, digest.digest()));
+		} catch (Exception e){
+			e.printStackTrace();
+		}
+		sha1 = org.apache.commons.codec.digest.DigestUtils.shaHex( value );
+		return sha1;
 	}
 }
